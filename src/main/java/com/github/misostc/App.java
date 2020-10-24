@@ -67,7 +67,8 @@ public class App {
 			clientCredentials = authorizationCodeRefreshRequest.execute();
 			spotifyApi.setAccessToken(clientCredentials.getAccessToken());
 		}
-		catch (Exception e) {
+		catch (Exception e) {			
+			System.out.println("Error: " + e.getMessage());
 			System.exit(-1);
 		}
 	}
