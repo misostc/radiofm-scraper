@@ -19,3 +19,8 @@ jobs:
           java-version: 1.8
       - name: Build with Maven
         run: mvn clean compile exec:java
+        env:
+          CLIENT_ID: ${secret.CLIENT_ID}
+          CLIENT_SECRET: ${secret.CLIENT_SECRET}
+          REFRESH_TOKEN: ${secret.REFRESH_TOKEN}
+          PLAYLIST_ID: ${secret.PLAYLIST_ID}
