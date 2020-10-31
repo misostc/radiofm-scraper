@@ -43,6 +43,11 @@
       <artifactId>slf4j-nop</artifactId>
       <version>1.7.30</version>
     </dependency>
+    <dependency>
+      <groupId>org.bidib.jbidib.swinglabs.swingx</groupId>
+      <artifactId>swingx-graphics</artifactId>
+      <version>1.6.5-1</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -87,6 +92,7 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
+
       </plugins>
     </pluginManagement>
 
