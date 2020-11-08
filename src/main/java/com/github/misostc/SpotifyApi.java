@@ -3,10 +3,12 @@ package com.github.misostc;
 import com.neovisionaries.i18n.CountryCode;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import com.wrapper.spotify.model_objects.special.SnapshotResult;
 import com.wrapper.spotify.model_objects.specification.ArtistSimplified;
 import com.wrapper.spotify.model_objects.specification.Paging;
 import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
+import com.wrapper.spotify.requests.data.playlists.AddItemsToPlaylistRequest;
 import com.wrapper.spotify.requests.data.playlists.ReplacePlaylistsItemsRequest;
 import com.wrapper.spotify.requests.data.playlists.UploadCustomPlaylistCoverImageRequest;
 import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
@@ -62,7 +64,7 @@ class SpotifyApi {
 
     private List<SpotifyTrack> toSpotifyTracks(Track[] items) {
         List<SpotifyTrack> resultList = new ArrayList<>();
-        for(Track track : items) {
+        for (Track track : items) {
             SpotifyTrack spotifyTrack = new SpotifyTrack();
             spotifyTrack.setArtists(Arrays.stream(track.getArtists()).map(ArtistSimplified::getName).collect(Collectors.toList()));
             spotifyTrack.setTitle(track.getName());
@@ -74,20 +76,38 @@ class SpotifyApi {
     }
 
     public void updatePlaylist(String playlistId, List<SpotifyTrack> trackList) {
-	final String[] uriArray = trackList.stream().map(SpotifyTrack::getSpotifyUri).toArray(String[]::new);
-	System.out.println("Array Length: " + uriArray.length);
-	System.out.println("Array 1st   : " + uriArray[0]);
-	    
-        ReplacePlaylistsItemsRequest replacePlaylistsItemsRequest = spotifyApi
-                .replacePlaylistsItems(playlistId, uriArray).build();
+
+        clearPlaylist(playlistId);
+
+        final List<String> uris = new ArrayList<>();
+        uris.addAll(trackList.stream().map(SpotifyTrack::getSpotifyUri).collect(Collectors.toList()));
+
+        while (!uris.isEmpty()) {
+            final List<String> firstChunk = uris.size() > 100 ? uris.subList(0, 100) : uris;
+
+            AddItemsToPlaylistRequest addItemsToPlaylistRequest = spotifyApi
+                    .addItemsToPlaylist(playlistId, firstChunk.toArray(new String[0])).build();
+            try {
+                final SnapshotResult result = addItemsToPlaylistRequest.execute();
+                System.out.println("SnapshotID: " + result.getSnapshotId());
+                uris.removeAll(firstChunk);
+            } catch (IOException | SpotifyWebApiException | ParseException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    private void clearPlaylist(final String playlistId) {
+        ReplacePlaylistsItemsRequest makePlaylistEmpty = spotifyApi
+                .replacePlaylistsItems(playlistId, new String[0]).build();
         try {
-            final String string = replacePlaylistsItemsRequest.execute();
-			System.out.println("Null: " + string);
+            final String string = makePlaylistEmpty.execute();
+            System.out.println("ClearedPlaylist: " + string);
         } catch (IOException | SpotifyWebApiException | ParseException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
+
     public void updatePlaylistCover(String playlistId, byte[] imageJPG) {
         UploadCustomPlaylistCoverImageRequest coverImageRequest = spotifyApi.uploadCustomPlaylistCoverImage(playlistId)
                 .image_data(Base64.getEncoder().encodeToString(imageJPG))
