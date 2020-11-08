@@ -85,7 +85,7 @@ class SpotifyApi {
         uris.addAll(trackList.stream().map(SpotifyTrack::getSpotifyUri).collect(Collectors.toList()));
 
         while (!uris.isEmpty()) {
-            final List<String> firstChunk = uris.size() > 100 ? uris.subList(0, 100) : uris;
+            final List<String> firstChunk = uris.size() > 100 ? uris.subList(0, 99) : uris;
 
             AddItemsToPlaylistRequest addItemsToPlaylistRequest = spotifyApi
                     .addItemsToPlaylist(playlistId, firstChunk.toArray(new String[0])).build();
