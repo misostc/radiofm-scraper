@@ -1,5 +1,6 @@
 package com.github.misostc;
 
+import com.google.gson.JsonArray;
 import com.neovisionaries.i18n.CountryCode;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
@@ -54,6 +55,7 @@ class SpotifyApi {
             final Paging<Track> trackPaging = searchTracksRequest.execute();
             return toSpotifyTracks(trackPaging.getItems());
         } catch (IOException | SpotifyWebApiException | ParseException ex) {
+            System.err.println("Error while searching song");
             throw new RuntimeException(ex);
         }
     }
@@ -92,6 +94,7 @@ class SpotifyApi {
                 System.out.println("SnapshotID: " + result.getSnapshotId());
                 uris.removeAll(firstChunk);
             } catch (IOException | SpotifyWebApiException | ParseException ex) {
+                System.err.println("Error while updating playlist");
                 throw new RuntimeException(ex);
             }
         }
@@ -99,11 +102,12 @@ class SpotifyApi {
 
     private void clearPlaylist(final String playlistId) {
         ReplacePlaylistsItemsRequest makePlaylistEmpty = spotifyApi
-                .replacePlaylistsItems(playlistId, new String[0]).build();
+                .replacePlaylistsItems(playlistId, new JsonArray()).build();
         try {
             final String string = makePlaylistEmpty.execute();
             System.out.println("ClearedPlaylist: " + string);
         } catch (IOException | SpotifyWebApiException | ParseException ex) {
+            System.err.println("Error while clearing playlist");
             throw new RuntimeException(ex);
         }
     }
