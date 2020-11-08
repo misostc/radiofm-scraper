@@ -29,6 +29,7 @@ public class App {
 					.min(levenshteinSort(fmTrack))
 					.ifPresent(spotifyTrack -> {
 						System.out.println("Found:    " + spotifyTrack.toSimpleString());
+						System.out.println("URI:      " + spotifyTrack.getSpotifyUri());
 						resultingPlaylist.add(spotifyTrack);
 					});
 			System.out.println();
