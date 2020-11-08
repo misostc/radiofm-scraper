@@ -77,12 +77,13 @@ class SpotifyApi {
         ReplacePlaylistsItemsRequest replacePlaylistsItemsRequest = spotifyApi
                 .replacePlaylistsItems(playlistId, trackList.stream().map(SpotifyTrack::getSpotifyUri).toArray(String[]::new)).build();
         try {
-            replacePlaylistsItemsRequest.execute();
+            final String string = replacePlaylistsItemsRequest.execute();
+			System.out.println("Null: " + string);
         } catch (IOException | SpotifyWebApiException | ParseException ex) {
             throw new RuntimeException(ex);
         }
     }
-
+    
     public void updatePlaylistCover(String playlistId, byte[] imageJPG) {
         UploadCustomPlaylistCoverImageRequest coverImageRequest = spotifyApi.uploadCustomPlaylistCoverImage(playlistId)
                 .image_data(Base64.getEncoder().encodeToString(imageJPG))
