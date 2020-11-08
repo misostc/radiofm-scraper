@@ -87,8 +87,11 @@ class SpotifyApi {
         while (!uris.isEmpty()) {
             final List<String> firstChunk = uris.size() > 100 ? uris.subList(0, 99) : uris;
 
+            JsonArray playlistArray = new JsonArray();
+            firstChunk.forEach(playlistArray::add);
+            
             AddItemsToPlaylistRequest addItemsToPlaylistRequest = spotifyApi
-                    .addItemsToPlaylist(playlistId, firstChunk.toArray(new String[0])).build();
+                    .addItemsToPlaylist(playlistId, playlistArray).build();
             try {
                 final SnapshotResult result = addItemsToPlaylistRequest.execute();
                 System.out.println("SnapshotID: " + result.getSnapshotId());
