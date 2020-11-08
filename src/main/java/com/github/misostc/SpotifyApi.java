@@ -74,8 +74,12 @@ class SpotifyApi {
     }
 
     public void updatePlaylist(String playlistId, List<SpotifyTrack> trackList) {
+	final String[] uriArray = trackList.stream().map(SpotifyTrack::getSpotifyUri).toArray(String[]::new);
+	System.out.println("Array Length: " + uriArray.length);
+	System.out.println("Array 1st   : " + uriArray[0]);
+	    
         ReplacePlaylistsItemsRequest replacePlaylistsItemsRequest = spotifyApi
-                .replacePlaylistsItems(playlistId, trackList.stream().map(SpotifyTrack::getSpotifyUri).toArray(String[]::new)).build();
+                .replacePlaylistsItems(playlistId, uriArray).build();
         try {
             final String string = replacePlaylistsItemsRequest.execute();
 			System.out.println("Null: " + string);
